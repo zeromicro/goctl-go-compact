@@ -80,9 +80,13 @@ func main() {
 		panic(err)
 	}
 
-	err = gogen.DoGenProject(plugin.ApiFilePath, plugin.Dir, plugin.Style)
+	err = gogen.DoGenProject(plugin.ApiFilePath, plugin.Dir, strings.TrimSpace(plugin.Style))
 	if err != nil {
 		panic(err)
+	}
+
+	if len(plugin.Style) == 0 {
+		plugin.Style = "gozero"
 	}
 
 	var api = plugin.Api
