@@ -142,7 +142,7 @@ func gen(folder string, group spec.Group, dir, nameStyle string) error {
 	}
 	defer fp.Close()
 
-	text, err := util2.LoadTemplate("api", "handler.tpl", handlerTemplate)
+	text, err := util2.LoadTemplate("api", "handlers.tpl", handlerTemplate)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func gen(folder string, group spec.Group, dir, nameStyle string) error {
 	return err
 }
 
-func funcExist(filename, name string) bool {
+func funcExist(filename, funcName string) bool {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return false
@@ -218,7 +218,7 @@ func funcExist(filename, name string) bool {
 
 	for _, d := range packs.Decls {
 		if fn, isFn := d.(*ast.FuncDecl); isFn {
-			if fn.Name.String() == name {
+			if fn.Name.String() == funcName {
 				return true
 			}
 		}
