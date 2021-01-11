@@ -1,4 +1,4 @@
-module mergehandler
+module github.com/zeromicro/goctl-go-compact
 
 go 1.13
 
