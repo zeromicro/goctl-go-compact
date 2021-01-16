@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"go/ast"
 	goformat "go/format"
@@ -15,16 +14,16 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
-	"unicode"
 
 	"github.com/tal-tech/go-zero/core/stringx"
 	"github.com/tal-tech/go-zero/tools/goctl/api/gogen"
 	"github.com/tal-tech/go-zero/tools/goctl/api/spec"
-	"github.com/tal-tech/go-zero/tools/goctl/api/util"
+
 	"github.com/tal-tech/go-zero/tools/goctl/plugin"
 	util2 "github.com/tal-tech/go-zero/tools/goctl/util"
 	"github.com/tal-tech/go-zero/tools/goctl/util/ctx"
 	"github.com/tal-tech/go-zero/tools/goctl/util/format"
+	"github.com/tal-tech/go-zero/tools/goctl/vars"
 	"go.etcd.io/etcd/pkg/fileutil"
 )
 
@@ -162,11 +161,11 @@ func gen(folder string, group spec.Group, dir, nameStyle string) error {
 
 		handleObj := Handler{
 			HandlerName: handler,
-			RequestType: strings.Title(route.RequestType.Name),
+			RequestType: strings.Title(route.RequestTypeName()),
 			LogicType:   strings.Title(getLogicName(route)),
 			Call:        strings.Title(strings.TrimSuffix(handler, "Handler")),
-			HasResp:     len(route.ResponseType.Name) > 0,
-			HasRequest:  len(route.RequestType.Name) > 0,
+			HasResp:     len(route.ResponseTypeName()) > 0,
+			HasRequest:  len(route.RequestTypeName()) > 0,
 		}
 
 		buffer := new(bytes.Buffer)
@@ -244,10 +243,10 @@ func getHandlerName(route spec.Route, folder string) string {
 }
 
 func getHandlerFolderPath(group spec.Group, route spec.Route) string {
-	folder, ok := util.GetAnnotationValue(route.Annotations, "server", groupProperty)
-	if !ok {
-		folder, ok = util.GetAnnotationValue(group.Annotations, "server", groupProperty)
-		if !ok {
+	folder := route.GetAnnotation(groupProperty)
+	if len(folder) == 0 {
+		folder = group.GetAnnotation(groupProperty)
+		if len(folder) == 0 {
 			return handlerDir
 		}
 	}
@@ -257,18 +256,7 @@ func getHandlerFolderPath(group spec.Group, route spec.Route) string {
 }
 
 func getHandlerBaseName(route spec.Route) (string, error) {
-	handler, ok := util.GetAnnotationValue(route.Annotations, "server", "handler")
-	if !ok {
-		return "", fmt.Errorf("missing handler annotation for %q", route.Path)
-	}
-
-	for _, char := range handler {
-		if !unicode.IsDigit(char) && !unicode.IsLetter(char) {
-			return "", errors.New(fmt.Sprintf("route [%s] handler [%s] invalid, handler name should only contains letter or digit",
-				route.Path, handler))
-		}
-	}
-
+	handler := route.Handler
 	handler = strings.TrimSpace(handler)
 	handler = strings.TrimSuffix(handler, "handler")
 	handler = strings.TrimSuffix(handler, "Handler")
@@ -298,10 +286,10 @@ func genHandlerImports(group spec.Group, route spec.Route, parentPkg string) []s
 	imports = append(imports, fmt.Sprintf("\"%s\"",
 		joinPackages(parentPkg, getLogicFolderPath(group, route))))
 	imports = append(imports, fmt.Sprintf("\"%s\"", joinPackages(parentPkg, contextDir)))
-	if len(route.RequestType.Name) > 0 {
+	if len(route.RequestTypeName()) > 0 {
 		imports = append(imports, fmt.Sprintf("\"%s\"\n", joinPackages(parentPkg, typesDir)))
 	}
-	imports = append(imports, fmt.Sprintf("\"%s/rest/httpx\"", projectOpenSourceUrl))
+	imports = append(imports, fmt.Sprintf("\"%s/rest/httpx\"", vars.ProjectOpenSourceUrl))
 
 	return imports
 }
@@ -311,10 +299,10 @@ func joinPackages(pkgs ...string) string {
 }
 
 func getLogicFolderPath(group spec.Group, route spec.Route) string {
-	folder, ok := util.GetAnnotationValue(route.Annotations, "server", groupProperty)
-	if !ok {
-		folder, ok = util.GetAnnotationValue(group.Annotations, "server", groupProperty)
-		if !ok {
+	folder := route.GetAnnotation(groupProperty)
+	if len(folder) == 0 {
+		folder = group.GetAnnotation(groupProperty)
+		if len(folder) == 0 {
 			return logicDir
 		}
 	}
