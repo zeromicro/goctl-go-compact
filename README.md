@@ -1,5 +1,7 @@
 # goctl-go-compact
 
+这个插件作用是将goctl默认的一个路由一个文件合并成一个文件
+
 ### 1. 编译goctl-go-compact插件
 
 ```
