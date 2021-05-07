@@ -23,7 +23,6 @@ import (
 	util2 "github.com/tal-tech/go-zero/tools/goctl/util"
 	"github.com/tal-tech/go-zero/tools/goctl/util/ctx"
 	"github.com/tal-tech/go-zero/tools/goctl/util/format"
-	"github.com/tal-tech/go-zero/tools/goctl/vars"
 	"go.etcd.io/etcd/pkg/fileutil"
 )
 
@@ -289,7 +288,7 @@ func genHandlerImports(group spec.Group, route spec.Route, parentPkg string) []s
 	if len(route.RequestTypeName()) > 0 {
 		imports = append(imports, fmt.Sprintf("\"%s\"\n", joinPackages(parentPkg, typesDir)))
 	}
-	imports = append(imports, fmt.Sprintf("\"%s/rest/httpx\"", vars.ProjectOpenSourceUrl))
+	imports = append(imports, fmt.Sprintf("\"%s/rest/httpx\"", projectOpenSourceUrl))
 
 	return imports
 }
