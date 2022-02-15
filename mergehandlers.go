@@ -15,14 +15,14 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/tal-tech/go-zero/core/stringx"
-	"github.com/tal-tech/go-zero/tools/goctl/api/gogen"
-	"github.com/tal-tech/go-zero/tools/goctl/api/spec"
+	"github.com/zeromicro/go-zero/core/stringx"
+	"github.com/zeromicro/go-zero/tools/goctl/api/gogen"
+	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 
-	"github.com/tal-tech/go-zero/tools/goctl/plugin"
-	util2 "github.com/tal-tech/go-zero/tools/goctl/util"
-	"github.com/tal-tech/go-zero/tools/goctl/util/ctx"
-	"github.com/tal-tech/go-zero/tools/goctl/util/format"
+	"github.com/zeromicro/go-zero/tools/goctl/plugin"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
+	"github.com/zeromicro/go-zero/tools/goctl/util/format"
 	"go.etcd.io/etcd/pkg/fileutil"
 )
 
@@ -35,7 +35,7 @@ const (
 	typesDir             = interval + typesPacket
 	contextDir           = interval + "svc"
 	pkgSep               = "/"
-	projectOpenSourceUrl = "github.com/tal-tech/go-zero"
+	projectOpenSourceUrl = "github.com/zeromicro/go-zero"
 	handlerImports       = `package handler
 
 import (
@@ -144,7 +144,7 @@ func gen(folder string, group spec.Group, dir, nameStyle string) error {
 	}
 	defer fp.Close()
 
-	text, err := util2.LoadTemplate("api", "handlers.tpl", handlerTemplate)
+	text, err := pathx.LoadTemplate("api", "handlers.tpl", handlerTemplate)
 	if err != nil {
 		return err
 	}
