@@ -5,7 +5,7 @@
 ### 1. 编译goctl-go-compact插件
 
 ```
-$ GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/zeromicro/goctl-go-compact
+$ GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/goctl-go-compact@latest
 ```
 
 ### 2. 配置环境
