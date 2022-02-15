@@ -1,16 +1,19 @@
 # goctl-go-compact
 
-这个插件作用是将goctl默认的一个路由一个文件合并成一个文件
+This plugin is used to merge all the routes in one file.
 
-### 1. 编译goctl-go-compact插件
+### 1. install goctl-go-compact
 
 ```
 $ GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/goctl-go-compact@latest
 ```
 
-### 2. 配置环境
-将$GOPATH/bin中的goctl-go-compact添加到环境变量
+### 2. environment setup
 
-### 3. 使用姿势
+Make sure the installed `goctl-go-compact` in your `$PATH`
 
+### 3. Usage
+
+```
 $ goctl api plugin -p goctl-go-compact -api user.api -dir .
+```
