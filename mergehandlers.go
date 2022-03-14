@@ -20,9 +20,9 @@ import (
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 
 	"github.com/zeromicro/go-zero/tools/goctl/plugin"
-	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
 	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 	"go.etcd.io/etcd/pkg/fileutil"
 )
 
@@ -52,7 +52,7 @@ import (
 			return
 		}{{end}}
 
-		l := logic.New{{.LogicType}}(r.Context(), ctx)
+		l := {{.LogicPackage}}.New{{.LogicType}}(r.Context(), ctx)
 		{{if .HasResp}}resp, {{end}}err := l.{{.Call}}({{if .HasRequest}}req{{end}})
 		if err != nil {
 			httpx.Error(w, err)
@@ -64,12 +64,13 @@ import (
 )
 
 type Handler struct {
-	HandlerName string
-	RequestType string
-	LogicType   string
-	Call        string
-	HasResp     bool
-	HasRequest  bool
+	HandlerName  string
+	RequestType  string
+	LogicType    string
+	Call         string
+	HasResp      bool
+	HasRequest   bool
+	LogicPackage string
 }
 
 func main() {
@@ -159,12 +160,13 @@ func gen(folder string, group spec.Group, dir, nameStyle string) error {
 		fmt.Println("merge handler " + handler)
 
 		handleObj := Handler{
-			HandlerName: handler,
-			RequestType: strings.Title(route.RequestTypeName()),
-			LogicType:   strings.Title(getLogicName(route)),
-			Call:        strings.Title(strings.TrimSuffix(handler, "Handler")),
-			HasResp:     len(route.ResponseTypeName()) > 0,
-			HasRequest:  len(route.RequestTypeName()) > 0,
+			HandlerName:  handler,
+			RequestType:  strings.Title(route.RequestTypeName()),
+			LogicType:    strings.Title(getLogicName(route)),
+			Call:         strings.Title(strings.TrimSuffix(handler, "Handler")),
+			HasResp:      len(route.ResponseTypeName()) > 0,
+			HasRequest:   len(route.RequestTypeName()) > 0,
+			LogicPackage: findLogicPackage(group, route),
 		}
 
 		buffer := new(bytes.Buffer)
@@ -252,6 +254,20 @@ func getHandlerFolderPath(group spec.Group, route spec.Route) string {
 	folder = strings.TrimPrefix(folder, "/")
 	folder = strings.TrimSuffix(folder, "/")
 	return path.Join(handlerDir, folder)
+}
+
+func findLogicPackage(group spec.Group, route spec.Route) string {
+	folder := route.GetAnnotation(groupProperty)
+	if len(folder) > 0 {
+		return folder
+	}
+
+	folder = group.GetAnnotation(groupProperty)
+	if len(folder) > 0 {
+		return folder
+	}
+
+	return "logic"
 }
 
 func getHandlerBaseName(route spec.Route) (string, error) {
