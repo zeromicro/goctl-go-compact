@@ -259,12 +259,14 @@ func getHandlerFolderPath(group spec.Group, route spec.Route) string {
 func findLogicPackage(group spec.Group, route spec.Route) string {
 	folder := route.GetAnnotation(groupProperty)
 	if len(folder) > 0 {
-		return folder
+		parts := strings.Split(folder, "/")
+		return parts[len(parts)-1]
 	}
 
 	folder = group.GetAnnotation(groupProperty)
 	if len(folder) > 0 {
-		return folder
+		parts := strings.Split(folder, "/")
+		return parts[len(parts)-1]
 	}
 
 	return "logic"
